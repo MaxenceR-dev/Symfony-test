@@ -2,15 +2,22 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Entity\Article;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ *  @UniqueEntity( fields={"username"},errorPath="username",message=" {{ value }} deja utilisé.")
+ * @UniqueEntity( fields={"email"},errorPath="email",message=" {{ value }} deja utilisé.")
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -23,8 +30,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     *  * @Assert\Regex(
+     *     pattern="/^([a-zA-Z0-9\s\-_]){3,20}$/",
+     *     message="erreur username"
+     * )
      */
-    private $Username;
+    private $username;
 
     /**
      * @ORM\Column(type="json")
@@ -34,33 +45,56 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * * @Assert\Regex(
+     *     pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+!*$@%_])([-+!*$@%_\w]{8,15})$/",
+     *     message="erreur du mdp"
+     * )
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
+     *   * @Assert\Email(
+     *     message = "L'email '{{ value }}' n'est pas valide."
+     * )
      */
-    private $Email;
+    private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     *  * @Assert\Regex(
+     *     pattern="/^[a-zA-Z\s\p{L}]{2,20}$/u",
+     *     message="erreur du prenom"
+     * )
      */
-    private $FirstName;
+    private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
+     *  * @Assert\Regex(
+     *     pattern="/^[a-zA-Z\s\p{L}]{2,20}$/u",
+     *     message="erreur du nom"
+     * )
      */
-    private $LastName;
+    private $lastname;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $CreatedAt;
+    private $createdAt;
 
     /**
      * @ORM\OneToMany(targetEntity=Article::class, mappedBy="Author", orphanRemoval=true)
      */
     private $articles;
+
+    /**
+     * @Assert\EqualTo(propertyPath = "password", message="les deux mots de passes ne sont pas identiques")
+     */
+    private $passwordConfirm;
+
+
+
 
     public function __construct()
     {
@@ -75,12 +109,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUsername(): ?string
     {
-        return $this->Username;
+        return $this->username;
     }
 
-    public function setUsername(string $Username): self
+    public function setUsername(string $username): self
     {
-        $this->Username = $Username;
+        $this->username = $username;
 
         return $this;
     }
@@ -92,7 +126,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->Username;
+        return (string) $this->username;
     }
 
     /**
@@ -151,48 +185,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getEmail(): ?string
     {
-        return $this->Email;
+        return $this->email;
     }
 
-    public function setEmail(string $Email): self
+    public function setEmail(string $email): self
     {
-        $this->Email = $Email;
+        $this->email = $email;
 
         return $this;
     }
 
     public function getFirstName(): ?string
     {
-        return $this->FirstName;
+        return $this->firstname;
     }
 
-    public function setFirstName(string $FirstName): self
+    public function setFirstName(string $firstname): self
     {
-        $this->FirstName = $FirstName;
+        $this->firstname = $firstname;
 
         return $this;
     }
 
     public function getLastName(): ?string
     {
-        return $this->LastName;
+        return $this->lastname;
     }
 
-    public function setLastName(string $LastName): self
+    public function setLastName(string $lastname): self
     {
-        $this->LastName = $LastName;
+        $this->lastname = $lastname;
 
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->CreatedAt;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $CreatedAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        $this->CreatedAt = $CreatedAt;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -230,5 +264,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString()
     {
         return $this->firstname . ' ' . $this->lastname;
+    }
+
+    public function getPasswordConfirm(): string
+    {
+        return (string) $this->passwordConfirm;
+    }
+
+    public function setPasswordConfirm(string $passwordConfirm): self
+    {
+        $this->passwordConfirm = $passwordConfirm;
+
+        return $this;
     }
 }

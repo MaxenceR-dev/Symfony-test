@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ArticleRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Category;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ArticleRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass=ArticleRepository::class)
@@ -27,19 +28,19 @@ class Article
     /**
      * @ORM\Column(type="text")
      */
-    private $Content;
+    private $content;
 
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="articles")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Author;
+    private $author;
 
     /**
      * @ORM\ManyToMany(targetEntity=Category::class, inversedBy="articles")
      */
-    private $Category;
+    private $category;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -49,7 +50,7 @@ class Article
     /**
      * @ORM\Column(type="datetime")
      */
-    private $CreatedAt;
+    private $createdAt;
 
 
     public function __construct()
@@ -78,12 +79,12 @@ class Article
 
     public function getContent(): ?string
     {
-        return $this->Content;
+        return $this->content;
     }
 
-    public function setContent(string $Content): self
+    public function setContent(string $content): self
     {
-        $this->Content = $Content;
+        $this->content = $content;
 
         return $this;
     }
@@ -92,12 +93,12 @@ class Article
 
     public function getAuthor(): ?User
     {
-        return $this->Author;
+        return $this->author;
     }
 
-    public function setAuthor(?User $Author): self
+    public function setAuthor(?User $author): self
     {
-        $this->Author = $Author;
+        $this->author = $author;
 
         return $this;
     }
@@ -107,13 +108,13 @@ class Article
      */
     public function getCategory(): Collection
     {
-        return $this->Category;
+        return $this->category;
     }
 
     public function addCategory(Category $category): self
     {
-        if (!$this->Category->contains($category)) {
-            $this->Category[] = $category;
+        if (!$this->category->contains($category)) {
+            $this->category[] = $category;
         }
 
         return $this;
@@ -121,7 +122,7 @@ class Article
 
     public function removeCategory(Category $category): self
     {
-        $this->Category->removeElement($category);
+        $this->category->removeElement($category);
 
         return $this;
     }
@@ -140,12 +141,12 @@ class Article
 
     public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->CreatedAt;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $CreatedAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        $this->CreatedAt = $CreatedAt;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
